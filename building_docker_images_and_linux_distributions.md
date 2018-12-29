@@ -4,35 +4,25 @@ A **Docker** image must have an **operating system** provided by the _base image
 This must be a **Linux distribution** when the **host** **operating system** is itself **Linux**.
 
 _Linux based_ images **should share the same Linux kernel version** as the
-**host OS** running **docker-machine**. However, it **need not be the same
-distribution**.
+**host OS** running **docker-machine**. However, it **need not be the same distribution**.
 
 # Linux Distributions
 
 There are only a few distinct **Linux distributions** where the **package manager** determines the kind.
 
-Linux Distribution                                                         | Image Size                                                  | Package Manager                   | C/C++ Linkage |    
-Description                                                                
----------------------------------------------------------------------------|-------------------------------------------------------------|-----------------------------------|---------------|----
-**alpine Linux**                                                           | _small_                                                     | **[Search                         
-for](https://pkgs.alpinelinux.org/packages)apk** _alpine package manager_  |                                                             
-**muslc** linkage                                                          | **alpine Linux** is a _very small_ **busybox** operating    
-system and the resulting **image** files are small                         
-**CentOS**                                                                 | _large_                                                     | **RPM** _Red Hat package manager_ | **GCC glibc** 
-linkage                                                                    | **CentOS** (or **Fedora** , **Red Hat** , **RHEL** ) is the 
-_largest_ one and produces **fat** **image** files                         
-**Debian** **Slim**                                                        | _medium_                                                    | **[Search                         
-for](https://www.debian.org/distrib/packages#search_packages)aptitude** or 
-**apt-get**                                                                | **GCC glibc** linkage                                       | **Debian Slim** is a _lighter_    
-**Debian** footprint, but compiles the same C-source as **CentOS**         
+Linux Distribution | Image Size | Package Manager | C/C++ Linkage | Description
+-------------------|------------|-----------------|---------------|------------
+**alpine Linux**   | _small_    | **[Search for](https://pkgs.alpinelinux.org/packages)apk** _alpine package manager_  | **muslc** linkage | **alpine Linux** is a _very small_ **busybox** operating system and the resulting **image** files are small
+**CentOS** | _large_ | **RPM** _Red Hat package manager_ | **GCC glibc** linkage | **CentOS** (or **Fedora** , **Red Hat** , **RHEL** ) is the _largest_ one and produces **fat** **image** files
+**Debian** **Slim** | _medium_ | **[Search for](https://www.debian.org/distrib/packages#search_packages)aptitude** or **apt-get** | **GCC glibc** linkage | **Debian Slim** is a _lighter_ **Debian** footprint, but compiles the same C-source as **CentOS**         
 
 
 ## Building Smaller Images
 
-Choosing the right **Linux distribution** can make **Docker** build much
-smaller images, **megabytes instead of gigabytes**. Yet, there is a _trade
-off_ between **size** and the **programmer's time** , where familiarity with a
-**distribution** makes the **Dockerfile** easier to write.
+Choosing the right **Linux distribution** can make **Docker** build much smaller images,
+**megabytes instead of gigabytes**. Yet, there is a _trade off_ between **size**
+and the **programmer's time** , where familiarity with a **distribution** makes
+the **Dockerfile** easier to write.
 
 Some guideline on the **Linux distributions** is given here.
 
@@ -40,13 +30,12 @@ Some guideline on the **Linux distributions** is given here.
 
 This one creates the **smallest** image, but the **operating system** is
 **busybox** and **muslc** linkage. An **alpine** image may not build C/C++
-code that the others can, and many **python3** libraries have a C-source
-component.
+code that the others can, and many **python3** libraries have a C-source component.
 
 ### CentOS
 
-This one creates the **largest** image, but _at AT &T_ it is **exactly the
-same operating system** as the **host machine**. There is very little chance
+This one creates the **largest** image. When it is **exactly the
+same operating system** as the **host machine**, there is very little chance
 the image has incompatible code. A programmer who has used **RHEL** and
 **rpm** can write write a **Dockerfile** quickly.
 
@@ -63,7 +52,7 @@ Each **Linux distribution** can create a **Python WSGI** **Webserver** using
 **Python** source project the same way. The **mod_wsgi-express start-server**
 paradigm makes this easy.
 
-Alpine Linux has no start-server
+## Alpine Linux has no start-server
 
 The **alpine linux** version of **python3-mod_wsgi** does not support
 **mod_wsgi-express** and its **start-server** command. The **mod_wsgI** module
@@ -88,12 +77,10 @@ the **Dockerfile ENTRYPOINT=/home/bin/start-server.sh** to run a REST API
 service.
 
  **Run start-server as Docker ENTRYPOINT**
-
-    
     
     #! /bin/bash
     #
-    # WFA OSSCWL Apache mod-wsgi service
+    # Apache mod-wsgi service
     # =============================================================================
     
     WEB_USER="www-data" # Debian
@@ -102,8 +89,8 @@ service.
         --user "${WEB_USER}" \
         --maximum-requests=250 \
         --access-log \
-        --access-log-format "[OSSCWL-API][%>s] %h %l %u %b \"%{Referer}i\" \"%{User-agent}i\" \"%r\"" \
-        --error-log-format  "[OSSCWL-API][%l] %M" \
+        --access-log-format "[REST-API][%>s] %h %l %u %b \"%{Referer}i\" \"%{User-agent}i\" \"%r\"" \
+        --error-log-format  "[REST-API][%l] %M" \
         --log-to-terminal --log-level INFO \
         --url-alias /static static \
         --host 0.0.0.0 --port 8030 \
@@ -112,5 +99,5 @@ service.
         --passenv no_proxy \
         --working-directory /home/app \
         --compress-responses \
-        --application-type module osscwl_api.wsgi
+        --application-type module service.wsgi
 
